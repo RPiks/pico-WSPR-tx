@@ -6,11 +6,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  main.c - the Project's entry point.
-// 
+//  BitEmitter.h - Produces a time-accurate bit stream.
 //
 //  DESCRIPTION
-//  !FIXME!
+//  Receives data asynchronously. Calls low level bit tx funcs synchronously
+//  in time according to params.
 //
 //  HOWTOSTART
 //  .
@@ -46,17 +46,33 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
-#include <string.h>
+#ifndef BITEMITTER_H_
+#define BITEMITTER_H_
+
+#include <stdint.h>
 #include <stdlib.h>
+#include "hardware/clocks.h"
+#include "pico/stdlib.h"
+#include "../pico-hf-oscillator/lib/assert.h"
 
-#include "defines.h"
-
-#include "pico/multicore.h"
-#include "pico-hf-oscillator/defines.h"
-#include "pico-hf-oscillator/piodco/piodco.h"
-#include "pico-hf-oscillator/lib/assert.h"
-
-int main()
+typedef struct
 {
+    uint64_t _tm_future_call;
+    uint32_t _bit_period_us;
+    uint8_t _bits_per_sample;
 
-}
+    uint8_t _timer_alarm_num;
+
+    uint8_t _u8byte_buffer[256];
+    uint8_t _ix_input, _ix_output;
+    uint8_t _ixbit_output;
+
+    int (*_pf_modulator)(uint8_t bits_per_sample, uint8_t sample_val);
+
+} BitEmitterContext;
+
+BitEmitterContext *BitEmitterInit(const uint32_t bit_period_us, uint8_t timer_alarm_num, 
+                                  uint8_t bits_per_sample, void *pfmodulator);
+void __not_in_flash_func (BitEmitterISR)(void);
+
+#endif

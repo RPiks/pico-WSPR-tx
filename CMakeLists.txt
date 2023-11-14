@@ -31,6 +31,7 @@ add_executable(pico-wspr-tx)
 
 target_sources(pico-wspr-tx PUBLIC
 	             ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/lib/assert.c
+               ${CMAKE_CURRENT_LIST_DIR}/BitEmitter/bitemitter.c
                ${CMAKE_CURRENT_LIST_DIR}/main.c
               )
 
@@ -42,9 +43,10 @@ pico_enable_stdio_usb(pico-wspr-tx 0)
 
 # Add the standard include files to the build
 target_include_directories(pico-wspr-tx PRIVATE
-  ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
-)
+                           ${CMAKE_CURRENT_LIST_DIR}
+                           ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/piodco
+                           ${CMAKE_CURRENT_LIST_DIR}/..
+                          )
 
 # Add any user requested libraries
 target_link_libraries(
