@@ -1,0 +1,3 @@
+[submodule "pico-hf-oscillator"]
+	path = pico-hf-oscillator
+	url = https://github.com/RPiks/pico-hf-oscillator
