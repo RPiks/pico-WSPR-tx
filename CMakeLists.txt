@@ -31,20 +31,27 @@ add_executable(pico-wspr-tx)
 
 target_sources(pico-wspr-tx PUBLIC
 	             ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/lib/assert.c
-               ${CMAKE_CURRENT_LIST_DIR}/BitEmitter/bitemitter.c
+               ${CMAKE_CURRENT_LIST_DIR}/TxChannel/TxChannel.c
+               ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/WSPRutility.c
+               ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/nhash.c
+               ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/WSPRbeacon.c
+               ${CMAKE_CURRENT_LIST_DIR}/debug/logutils.c
                ${CMAKE_CURRENT_LIST_DIR}/main.c
               )
 
 pico_set_program_name(pico-wspr-tx "pico-wspr-tx")
 pico_set_program_version(pico-wspr-tx "0.1")
 
-pico_enable_stdio_uart(pico-wspr-tx 1)
-pico_enable_stdio_usb(pico-wspr-tx 0)
+pico_enable_stdio_uart(pico-wspr-tx 0)
+pico_enable_stdio_usb(pico-wspr-tx 1)
 
 # Add the standard include files to the build
 target_include_directories(pico-wspr-tx PRIVATE
                            ${CMAKE_CURRENT_LIST_DIR}
                            ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/piodco
+                           ${CMAKE_CURRENT_LIST_DIR}/TxChannel
+                           ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon
+                           ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty
                            ${CMAKE_CURRENT_LIST_DIR}/..
                           )
 

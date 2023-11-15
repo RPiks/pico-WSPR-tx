@@ -6,22 +6,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  main.c - the Project's entry point.
-// 
-//
+//  TxChannel.h - Produces a time-accurate stream.
+//                Invokes a `modulator` function. 
 //  DESCRIPTION
-//  !FIXME!
+//      Receives data asynchronously. Calls low level modulator function
+//      synchronously according to params.
 //
 //  HOWTOSTART
-//  .
+//      -
 //
 //  PLATFORM
 //      Raspberry Pi pico.
 //
 //  REVISION HISTORY
-// 
-//      Rev 0.1   18 Nov 2023
-//  Initial release.
+//      -
+//
+//  PROJECT PAGE
+//      https://github.com/RPiks/pico-WSPR-tx
 //
 //  LICENCE
 //      MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -46,68 +47,34 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
-#include <string.h>
-#include <stdio.h>
+#ifndef BITEMITTER_H_
+#define BITEMITTER_H_
+
+#include <stdint.h>
 #include <stdlib.h>
+#include "hardware/clocks.h"
+#include "pico/stdlib.h"
+#include "../pico-hf-oscillator/lib/assert.h"
 
-#include "defines.h"
+#define FREQ_STEP_MILLIHERTZ 1465
 
-#include "pico/multicore.h"
-#include "pico-hf-oscillator/lib/assert.h"
-#include "pico-hf-oscillator/defines.h"
-#include <piodco.h>
-
-#include <WSPRbeacon.h>
-
-#include "debug/logutils.h"
-
-int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index);
-
-int main()
+typedef struct
 {
-    DEBUGPRINTF("\n");
-    sleep_ms(1000);
-    DEBUGPRINTF("Pico-WSPR-tx start.");
+    uint64_t _tm_future_call;
+    uint32_t _bit_period_us;
 
-    DEBUGPRINTF("WSPR beacon init...");
-    WSPRbeaconContext *pWB = WSPRbeaconInit("R2BDY", "KO85", 6, FSK4mod);
-    DEBUGPRINTF("OK");
+    uint8_t _timer_alarm_num;
 
-    DEBUGPRINTF("Create packet...");
-    WSPRbeaconCreatePacket(pWB);
-    DEBUGPRINTF("OK");
-    
-    sleep_ms(100);
-    
-    int row = 0;
-    do
-    {
-        for(int i = 0; i < 16; ++i)
-        {
-            const int j = i + row * 16;
-            printf("%X ", pWB->_pu8_outbuf[j]);
-            if(161 == j)
-            {
-                row = -1;
-                break;
-            }
-        }
-        printf("\n");
-        if(-1 == row)
-            break;
-        ++row;
+    uint8_t _u8byte_buffer[256];
+    uint8_t _ix_input, _ix_output;
 
-    } while (true);
-    
-    for(;;)
-    {
-        DEBUGPRINTF("tick.");
-        sleep_ms(1000);
-    }
-}
+    int (*_pf_modulator)(uint32_t frq_step, uint8_t shift_val);
+    int (*_pf_setPTT)(uint8_t bptt_state);
 
-int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index)
-{
+} TxChannelContext;
 
-    return 0;
-}
+TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alarm_num, 
+                                void *pfmodulator);
+void __not_in_flash_func (TxChannelISR)(void);
+
+#endif

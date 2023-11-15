@@ -6,22 +6,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  BitEmitter.h - Produces a time-accurate bit stream.
-//
+//  BitEmitter.h - Produces a time-accurate bit stream. Invokes a modulator
+//                 Invokes a `modulator` function. 
 //  DESCRIPTION
-//  Receives data asynchronously. Calls low level bit tx funcs synchronously
-//  in time according to params.
+//      Receives data asynchronously. Calls low level modulator function
+//      synchronously according to params.
 //
 //  HOWTOSTART
-//  .
+//      -
 //
 //  PLATFORM
 //      Raspberry Pi pico.
 //
 //  REVISION HISTORY
-// 
-//      Rev 0.1   18 Nov 2023
-//  Initial release.
+//      -
 //
 //  LICENCE
 //      MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -46,33 +44,42 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
-#ifndef BITEMITTER_H_
-#define BITEMITTER_H_
-
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
 #include "hardware/clocks.h"
 #include "pico/stdlib.h"
-#include "../pico-hf-oscillator/lib/assert.h"
 
-typedef struct
+void StampPrintf(const char* pformat, ...)
 {
-    uint64_t _tm_future_call;
-    uint32_t _bit_period_us;
-    uint8_t _bits_per_sample;
+    static uint32_t sTick = 0;
+    if(!sTick)
+    {
+        stdio_init_all();
+    }
 
-    uint8_t _timer_alarm_num;
+    uint64_t tm_us = to_us_since_boot(get_absolute_time());
+    
+    const uint32_t tm_day = (uint32_t)(tm_us / 86400000000ULL);
+    tm_us -= (uint64_t)tm_day * 86400000000ULL;
 
-    uint8_t _u8byte_buffer[256];
-    uint8_t _ix_input, _ix_output;
-    uint8_t _ixbit_output;
+    const uint32_t tm_hour = (uint32_t)(tm_us / 3600000000ULL);
+    tm_us -= (uint64_t)tm_hour * 3600000000ULL;
 
-    int (*_pf_modulator)(uint8_t bits_per_sample, uint8_t sample_val);
+    const uint32_t tm_min = (uint32_t)(tm_us / 60000000ULL);
+    tm_us -= (uint64_t)tm_min * 60000000ULL;
+    
+    const uint32_t tm_sec = (uint32_t)(tm_us / 1000000ULL);
+    tm_us -= (uint64_t)tm_sec * 1000000ULL;
 
-} BitEmitterContext;
+    printf("%02lud%02lu:%02lu:%02lu.%06llu [%04lu] ", tm_day, tm_hour, tm_min, tm_sec, tm_us, sTick++);
 
-BitEmitterContext *BitEmitterInit(const uint32_t bit_period_us, uint8_t timer_alarm_num, 
-                                  uint8_t bits_per_sample, void *pfmodulator);
-void __not_in_flash_func (BitEmitterISR)(void);
+    va_list argptr;
+    va_start(argptr, pformat);
+    vprintf(pformat, argptr);
+    va_end(argptr);
 
-#endif
+    printf("\n");
+}
