@@ -6,11 +6,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  main.c - the Project's entry point.
+//  main.c - The project entry point.
 // 
-//
 //  DESCRIPTION
-//  !FIXME!
+//      The pico-WSPR-tx project provides WSPR beacon function using only
+//  Pi Pico board. *NO* additional hardware such as freq.synth required.
 //
 //  HOWTOSTART
 //  .
@@ -22,6 +22,9 @@
 // 
 //      Rev 0.1   18 Nov 2023
 //  Initial release.
+//
+//  PROJECT PAGE
+//      https://github.com/RPiks/pico-WSPR-tx
 //
 //  LICENCE
 //      MIT License (http://www.opensource.org/licenses/mit-license.php)
