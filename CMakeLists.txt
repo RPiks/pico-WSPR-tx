@@ -29,13 +29,18 @@ pico_sdk_init()
 
 add_executable(pico-wspr-tx)
 
+pico_generate_pio_header(pico-wspr-tx ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/piodco/dco.pio)
+
 target_sources(pico-wspr-tx PUBLIC
 	             ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/lib/assert.c
+               ${CMAKE_CURRENT_LIST_DIR}/pico-hf-oscillator/piodco/piodco.c
                ${CMAKE_CURRENT_LIST_DIR}/TxChannel/TxChannel.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/WSPRutility.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/nhash.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/WSPRbeacon.c
                ${CMAKE_CURRENT_LIST_DIR}/debug/logutils.c
+               ${CMAKE_CURRENT_LIST_DIR}/init.c
+               ${CMAKE_CURRENT_LIST_DIR}/core1.c
                ${CMAKE_CURRENT_LIST_DIR}/main.c
               )
 

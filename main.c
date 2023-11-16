@@ -61,7 +61,11 @@
 
 #include "debug/logutils.h"
 
+PioDco DCO;
+
 int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index);
+void InitPicoHW(void);
+void Core1Entry(void);
 
 int main()
 {
@@ -69,36 +73,25 @@ int main()
     sleep_ms(1000);
     DEBUGPRINTF("Pico-WSPR-tx start.");
 
-    DEBUGPRINTF("WSPR beacon init...");
-    WSPRbeaconContext *pWB = WSPRbeaconInit("R2BDY", "KO85", 6, FSK4mod);
-    DEBUGPRINTF("OK");
+    InitPicoHW();
 
+    DEBUGPRINTF("WSPR beacon init...");
+    WSPRbeaconContext *pWB = WSPRbeaconInit("R2BDY/QRPX", "KO85", 6, &DCO);
+    WSPRbeaconSetDialFreq(pWB, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ);
+    DEBUGPRINTF("OK");
+    
     DEBUGPRINTF("Create packet...");
     WSPRbeaconCreatePacket(pWB);
     DEBUGPRINTF("OK");
     
     sleep_ms(100);
-    
-    int row = 0;
-    do
-    {
-        for(int i = 0; i < 16; ++i)
-        {
-            const int j = i + row * 16;
-            printf("%X ", pWB->_pu8_outbuf[j]);
-            if(161 == j)
-            {
-                row = -1;
-                break;
-            }
-        }
-        printf("\n");
-        if(-1 == row)
-            break;
-        ++row;
+    DEBUGPRINTF("Start oscillator on Core #1...");
+    multicore_launch_core1(Core1Entry);
+    DEBUGPRINTF("OK");
 
-    } while (true);
-    
+    DEBUGPRINTF("Sending WSPR packet...");
+    WSPRbeaconSendPacket(pWB);
+
     for(;;)
     {
         DEBUGPRINTF("tick.");
@@ -108,6 +101,7 @@ int main()
 
 int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index)
 {
-
+    PioDCOSetFreq(&DCO, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ, 
+                  frq_step_millihz * shift_index);
     return 0;
 }

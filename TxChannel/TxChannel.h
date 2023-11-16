@@ -55,6 +55,7 @@
 #include "hardware/clocks.h"
 #include "pico/stdlib.h"
 #include "../pico-hf-oscillator/lib/assert.h"
+#include <piodco.h>
 
 #define FREQ_STEP_MILLIHERTZ 1465
 
@@ -64,17 +65,24 @@ typedef struct
     uint32_t _bit_period_us;
 
     uint8_t _timer_alarm_num;
+    uint8_t _b_allowtx;
 
-    uint8_t _u8byte_buffer[256];
     uint8_t _ix_input, _ix_output;
+    uint8_t _pbyte_buffer[256];
 
-    int (*_pf_modulator)(uint32_t frq_step, uint8_t shift_val);
-    int (*_pf_setPTT)(uint8_t bptt_state);
+    PioDco *_p_oscillator;
+    uint32_t _u32_dialfreqhz;
 
 } TxChannelContext;
 
-TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alarm_num, 
-                                void *pfmodulator);
-void __not_in_flash_func (TxChannelISR)(void);
+TxChannelContext *TxChannelInit(const uint32_t bit_period_us, 
+                                uint8_t timer_alarm_num, PioDco *pDCO);
+
+uint8_t TxChannelPending(TxChannelContext *pctx);
+int TxChannelPush(TxChannelContext *pctx, uint8_t *psrc, int n);
+int TxChannelPop(TxChannelContext *pctx, uint8_t *pdst);
+void TxChannelClear(TxChannelContext *pctx);
+void TxChannelStart(TxChannelContext *pctx);
+void TxChannelStop(TxChannelContext *pctx);
 
 #endif
