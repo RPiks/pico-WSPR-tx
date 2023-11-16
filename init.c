@@ -7,6 +7,7 @@
 
 #include "defines.h"
 
+/// @brief Initializes Pi pico low level hardware.
 void InitPicoHW(void)
 {
     gpio_init(PICO_DEFAULT_LED_PIN);

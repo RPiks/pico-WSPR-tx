@@ -7,8 +7,7 @@
 
 extern PioDco DCO;
 
-/* This is the code of dedicated core. 
-   We deal with extremely precise real-time task. */
+/// @brief The code of dedicated core' program running HF oscillator.
 void Core1Entry()
 {
     const uint32_t clkhz = PLL_SYS_MHZ * MHz;

@@ -59,7 +59,7 @@ static void __not_in_flash_func (TxChannelISR)(void)
     if(n2send)
     {
         PioDCOSetFreq(pDCO, spTX->_u32_dialfreqhz, 
-                      byte * FREQ_STEP_MILLIHERTZ);
+                      (uint32_t)byte * WSPR_FREQ_STEP_MILHZ);
     }
 
     spTX->_tm_future_call += spTX->_bit_period_us;
@@ -104,11 +104,19 @@ TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alar
     return p;
 }
 
+/// @brief Gets a count of bytes to send.
+/// @param pctx Context.
+/// @return A count of bytes.
 uint8_t TxChannelPending(TxChannelContext *pctx)
 {
     return 256 + pctx->_ix_input - pctx->_ix_output;
 }
 
+/// @brief Push a number of bytes to the output FIFO.
+/// @param pctx Context.
+/// @param psrc Ptr to buffer to send.
+/// @param n A count of bytes to send.
+/// @return A count of bytes has been sent (might be lower than n).
 int TxChannelPush(TxChannelContext *pctx, uint8_t *psrc, int n)
 {
     uint8_t *pdst = pctx->_pbyte_buffer;
@@ -120,6 +128,10 @@ int TxChannelPush(TxChannelContext *pctx, uint8_t *psrc, int n)
     return n;
 }
 
+/// @brief Retrieves a next byte from FIFO.
+/// @param pctx Context.
+/// @param pdst Ptr to write a byte.
+/// @return 1 if a byte has been retrived, or 0.
 int TxChannelPop(TxChannelContext *pctx, uint8_t *pdst)
 {
     if(pctx->_ix_input != pctx->_ix_output)
@@ -132,6 +144,8 @@ int TxChannelPop(TxChannelContext *pctx, uint8_t *pdst)
     return 0;
 }
 
+/// @brief Clears FIFO completely. Sets write&read indexes to 0.
+/// @param pctx Context.
 void TxChannelClear(TxChannelContext *pctx)
 {
     pctx->_ix_input = pctx->_ix_output = 0;

@@ -57,8 +57,6 @@
 #include "../pico-hf-oscillator/lib/assert.h"
 #include <piodco.h>
 
-#define FREQ_STEP_MILLIHERTZ 1465
-
 typedef struct
 {
     uint64_t _tm_future_call;

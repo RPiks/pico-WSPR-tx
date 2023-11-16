@@ -31,14 +31,14 @@
 
                                           /* Performing the square by ASM. */
 #define iSquare32ASM(x) (iMUL32ASM((x), (x))) 
-
-    /* Hardware defs. */
+                                                         /* Hardware defs. */
 #define kHz 1000UL
 #define MHz 1000000UL
 #define PLL_SYS_MHZ 270UL
-
-    /* WSPR defs. */
-#define WSPR_DIAL_FREQ_HZ   7040000UL
-#define WSPR_SHIFT_FREQ_HZ  88UL
+                                                             /* WSPR defs. */
+#define WSPR_DIAL_FREQ_HZ       7040000UL
+#define WSPR_SHIFT_FREQ_HZ      50UL
+//#define WSPR_FREQ_STEP_MILHZ    1465UL
+#define WSPR_FREQ_STEP_MILHZ    2930UL
 
 #endif
