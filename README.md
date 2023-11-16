@@ -1,7 +1,7 @@
 # pico-WSPR-tx
 WSPR beacon for Raspberry Pi Pico, based on pico-hf-oscillator PLL DCO library as submodule.
 
-![Screenshot_2023-11-16_22-42-12](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/9e2d0a9a-fe95-4e67-8b72-acd1011ed353)
+![Screenshot_2023-11-16_22-42-12](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/dcc20f80-17c8-4c37-84e6-c162bffd8bbb)
 
 # *NO* additional hardware
 The WSPR beacon provides the output signal on the GPIO pin of Raspberry Pi Pico. No externall PLL, analog oscillators!
