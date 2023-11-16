@@ -16,16 +16,16 @@ My QRZ page is https://www.qrz.com/db/R2BDY
 1. Install Raspberry Pi Pico SDK. Configure environment variables. Test whether it is built successfully.
 
 2. git clone https://github.com/RPiks/pico-WSPR-tx
-2.1. cd pico-WSPR-tx
-2.2. git submodule init
-2.3. ./build.sh
-2.4. Check whether output file ./build/pico-WSPR-tx.uf2 appears.
+3. cd pico-WSPR-tx
+4. git submodule init
+5. ./build.sh
+6. Check whether output file ./build/pico-WSPR-tx.uf2 appears.
 
-3. Load the .uf2 file (2) into the Pico.
+7. Load the .uf2 file (2) into the Pico.
 
-4. Initialy the operating HF band is 40 meter (WSPR dial frequency is 7040 kHz).
+8. Initialy the operating HF band is 40 meter (WSPR dial frequency is 7040 kHz).
 
-5. Provide the feedback by clicking like on the github page of the project.
+9. Provide the feedback by clicking like on the github page of the project.
 
 Cheers,
 Roman Piksaykin, amateur radio callsign R2BDY
