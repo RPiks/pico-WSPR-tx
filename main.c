@@ -66,7 +66,6 @@
 
 PioDco DCO;
 
-int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index);
 void InitPicoHW(void);
 void Core1Entry(void);
 
@@ -100,15 +99,4 @@ int main()
         DEBUGPRINTF("tick.");
         sleep_ms(1000);
     }
-}
-
-/// @brief Frequency shift keying modulator wrapper.
-/// @param frq_step_millihz Shift step, milliHertz.
-/// @param shift_index Shift index, [0..3] for WSPR.
-/// @return 0 if OK.
-int FSK4mod(uint32_t frq_step_millihz, uint8_t shift_index)
-{
-    PioDCOSetFreq(&DCO, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ, 
-                  frq_step_millihz * (uint32_t)shift_index);
-    return 0;
 }
