@@ -17,15 +17,14 @@ My QRZ page is https://www.qrz.com/db/R2BDY
 
 2. git clone https://github.com/RPiks/pico-WSPR-tx
 3. cd pico-WSPR-tx
-4. git submodule init
-5. ./build.sh
-6. Check whether output file ./build/pico-WSPR-tx.uf2 appears.
+4. ./build.sh
+5. Check whether output file ./build/pico-WSPR-tx.uf2 appears.
 
-7. Load the .uf2 file (2) into the Pico.
+6. Load the .uf2 file (2) into the Pico.
 
-8. Initialy the operating HF band is 40 meter (WSPR dial frequency is 7040 kHz).
+7. Initialy the operating HF band is 40 meter (WSPR dial frequency is 7040 kHz).
 
-9. Provide the feedback by clicking like on the github page of the project.
+8. Provide the feedback by clicking like on the github page of the project :).
 
 Cheers,
 Roman Piksaykin, amateur radio callsign R2BDY
