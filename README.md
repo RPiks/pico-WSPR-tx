@@ -9,7 +9,8 @@ The spectrum of this WSPR beacon received on SSB transceiver.
 
 # *NO* additional hardware
 The WSPR beacon provides the output signal on the GPIO pin of Raspberry Pi Pico. No externall PLL, analog oscillators!
-You should only provide a lowpass filter of appropriate frequency if you want to use this module extensively.
+You should only provide a lowpass filter of appropriate frequency if you want to use this module extensively. 
+The power transmitted using GPIO pin is sufficient only when using full-size dipole as antenna. If there is no such option available, you need to boost the signal using simple 1 transistor amplifier.
 
 # For what?
 This is an experimental project of amateur radio hobby and it is devised by me in order to experiment with QRP narrowband digital modes.
