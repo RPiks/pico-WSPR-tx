@@ -6,11 +6,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  BitEmitter.h - Produces a time-accurate bit stream. Invokes a modulator
-//                 Invokes a `modulator` function. 
+//  logutils.h - A set of utilities for logging/debugging.
+//
 //  DESCRIPTION
-//      Receives data asynchronously. Calls low level modulator function
-//      synchronously according to params.
+//      -
 //
 //  HOWTOSTART
 //      -
@@ -20,6 +19,9 @@
 //
 //  REVISION HISTORY
 //      -
+//
+//  PROJECT PAGE
+//      https://github.com/RPiks/pico-WSPR-tx
 //
 //  LICENCE
 //      MIT License (http://www.opensource.org/licenses/mit-license.php)
