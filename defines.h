@@ -88,12 +88,12 @@
 #define MHz 1000000UL
 #define PLL_SYS_MHZ 270UL
                                                              /* WSPR defs. */
-#define WSPR_DIAL_FREQ_HZ       7040000UL
-#define WSPR_SHIFT_FREQ_HZ      50UL
-//#define WSPR_FREQ_STEP_MILHZ    1465UL
+//#define WSPR_DIAL_FREQ_HZ       7040000UL
+//#define WSPR_SHIFT_FREQ_HZ      50UL
 #define WSPR_FREQ_STEP_MILHZ    2930UL
 
-#define MINUTE 60
+#define SECOND 1
+#define MINUTE (60 * SECOND)
 #define HOUR (60 * MINUTE)
 
 #define GPS_PPS_PIN 2

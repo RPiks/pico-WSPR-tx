@@ -90,4 +90,6 @@ int WSPRbeaconSendPacket(const WSPRbeaconContext *pctx);
 
 int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose);
 
+void WSPRbeaconDumpContext(const WSPRbeaconContext *pctx);
+
 #endif

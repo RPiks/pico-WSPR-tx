@@ -76,7 +76,7 @@ EXIT:
 /// @brief Initializes a TxChannel context. Starts ISR.
 /// @param bit_period_us Period of data bits, BPS speed = 1e6/bit_period_us.
 /// @param timer_alarm_num Pico-specific hardware timer resource id.
-/// @param pfmodulator Ptr to low level real-time modulator function.
+/// @param pDCO Ptr to oscillator.
 /// @return the Context.
 TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alarm_num, 
                                 PioDco *pDCO)
@@ -87,18 +87,18 @@ TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alar
     TxChannelContext *p = calloc(1, sizeof(TxChannelContext));
     assert_(p);
 
-    spTX = p;
-
     p->_bit_period_us = bit_period_us;
     p->_timer_alarm_num = timer_alarm_num;
     p->_p_oscillator = pDCO;
+
+    spTX = p;
 
     hw_set_bits(&timer_hw->inte, 1U << p->_timer_alarm_num);
     irq_set_exclusive_handler(TIMER_IRQ_0, TxChannelISR);
     irq_set_priority(TIMER_IRQ_0, 0x00);
     irq_set_enabled(TIMER_IRQ_0, true);
 
-    p->_tm_future_call = timer_hw->timerawl + 10000LL;
+    p->_tm_future_call = timer_hw->timerawl + 20000LL;
     timer_hw->alarm[p->_timer_alarm_num] = (uint32_t)p->_tm_future_call;
 
     return p;

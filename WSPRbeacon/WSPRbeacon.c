@@ -66,6 +66,8 @@ WSPRbeaconContext *WSPRbeaconInit(const char *pcallsign, const char *pgridsquare
                                   PioDco *pdco, uint32_t dial_freq_hz, uint32_t shift_freq_hz,
                                   int gpio)
 {
+    assert_(pcallsign);
+    assert_(pgridsquare);
     assert_(pdco);
 
     WSPRbeaconContext *p = calloc(1, sizeof(WSPRbeaconContext));
@@ -74,7 +76,6 @@ WSPRbeaconContext *WSPRbeaconInit(const char *pcallsign, const char *pgridsquare
     strncpy(p->_pu8_callsign, pcallsign, sizeof(p->_pu8_callsign));
     strncpy(p->_pu8_locator, pgridsquare, sizeof(p->_pu8_locator));
     p->_u8_txpower = txpow_dbm;
-    
 
     p->_pTX = TxChannelInit(682667, 0, pdco);
     assert_(p->_pTX);
@@ -132,11 +133,6 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
     const uint64_t u64_GPS_last_age_sec 
         = (u64tmnow - pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u64_sysclk_nmea_last) / 1000000ULL;
 
-#if 1
-    StampPrintf("%llu %lu %lu %lu %llu", u64tmnow, is_GPS_available, is_GPS_active, is_GPS_override, u64_GPS_last_age_sec);
-    //return 0;
-#endif
-
     if(!is_GPS_available)
     {
         StampPrintf("Waiting for GPS receiver...");
@@ -158,9 +154,8 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
             if(!itx_trigger)
             {
                 itx_trigger = 1;
-                StampPrintf("Start transmission.");
+                StampPrintf("Start TX.");
 
-                //WSPRbeaconSetDialFreq(pWB, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ);
                 WSPRbeaconCreatePacket(pctx);
                 
                 PioDCOStart(pctx->_pTX->_p_oscillator);
@@ -171,10 +166,35 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
         else
         {
             itx_trigger = 0;
-            StampPrintf("NO transmission slot.");
+            StampPrintf("Passive TX slot.");
             PioDCOStop(pctx->_pTX->_p_oscillator);
         }
     }
 
     return 0;
+}
+
+void WSPRbeaconDumpContext(const WSPRbeaconContext *pctx)
+{
+    assert_(pctx);
+    assert_(pctx->_pTX);
+
+    StampPrintf("__________________");
+    StampPrintf("=TxChannelContext=");
+    StampPrintf("ftc:%llu", pctx->_pTX->_tm_future_call);
+    StampPrintf("ixi:%u", pctx->_pTX->_ix_input);
+    StampPrintf("dfq:%lu", pctx->_pTX->_u32_dialfreqhz);
+    StampPrintf("gpo:%u", pctx->_pTX->_i_tx_gpio);
+
+    GPStimeContext *pGPS = pctx->_pTX->_p_oscillator->_pGPStime;
+    assert_(pGPS);
+    StampPrintf("=GPStimeContext=");
+    StampPrintf("err:%ld", pGPS->_i32_error_count);
+    StampPrintf("ixw:%lu", pGPS->_u8_ixw);
+    StampPrintf("sol:%u", pGPS->_time_data._u8_is_solution_active);
+    StampPrintf("unl:%lu", pGPS->_time_data._u32_utime_nmea_last);
+    StampPrintf("snl:%llu", pGPS->_time_data._u64_sysclk_nmea_last);
+    StampPrintf("rmc:%lu", pGPS->_time_data._u32_nmea_gprmc_count);
+    StampPrintf("pps:%llu", pGPS->_time_data._u64_sysclk_pps_last);
+    StampPrintf("ppb:%lld", pGPS->_time_data._i32_freq_shift_ppb);
 }

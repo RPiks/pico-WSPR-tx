@@ -74,12 +74,9 @@ int main()
 
     InitPicoHW();
 
+    PioDco DCO = {0};
+
     StampPrintf("WSPR beacon init...");
-    
-    PioDco DCO;
-    GPStimeContext *pGPS = GPStimeInit(0, 9600, GPS_PPS_PIN);
-    assert_(pGPS);
-    DCO._pGPStime = pGPS;
 
     WSPRbeaconContext *pWB = WSPRbeaconInit(
         "R2BDY",        /* the Callsign. */
@@ -92,23 +89,27 @@ int main()
         );
     assert_(pWB);
     pWSPR = pWB;
-
+    
     pWB->_txSched._u8_tx_GPS_mandatory = YES;   /* Send WSPR signals only when GPS solution is active. */
     pWB->_txSched._u8_tx_GPS_past_time = NO;    /* No relying on GPS sp;ution in the past. */
     pWB->_txSched._u8_tx_slot_skip = 1;         /* 1 slot tx, 1 slot idle, etc. */
     pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
 
-    StampPrintf("PioDco ADDR: %p", pWSPR->_pTX->_p_oscillator);
-
-    StampPrintf("RF oscillator start...");
-    sleep_ms(500);
+    //sleep_ms(500);
     multicore_launch_core1(Core1Entry);
+    StampPrintf("RF oscillator started.");
+
+    DCO._pGPStime = GPStimeInit(0, 9600, GPS_PPS_PIN);
+    assert_(DCO._pGPStime);
+    //StampPrintf("PioDco ADDR: %p", pWSPR->_pTX->_p_oscillator);
+    //StampPrintf("GPSTime ADDR: %p %p", pWSPR->_pTX->_p_oscillator->_pGPStime, DCO._pGPStime);
 
     for(;;)
     {
         WSPRbeaconTxScheduler(pWB, YES);
 
-        StampPrintf(".");
+        //StampPrintf(".");
+        WSPRbeaconDumpContext(pWB);
 
         sleep_ms(1000);
     }
