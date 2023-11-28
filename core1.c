@@ -56,23 +56,30 @@
 #include <piodco.h>
 #include "defines.h"
 
-extern PioDco DCO;
+#include <WSPRbeacon.h>
+
+extern WSPRbeaconContext *pWSPR;
 
 /// @brief The code of dedicated core' program running HF oscillator.
 void Core1Entry()
 {
+    assert_(pWSPR);
+
     const uint32_t clkhz = PLL_SYS_MHZ * MHz;
-    const uint32_t freq_hz = WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ;
+    const uint32_t freq_hz = pWSPR->_pTX->_u32_dialfreqhz;
+
+    PioDco *p = pWSPR->_pTX->_p_oscillator;
+    assert_(p);
 
     /* Initialize DCO */
-    assert_(0 == PioDCOInit(&DCO, 6, clkhz));
+    assert_(0 == PioDCOInit(p, pWSPR->_pTX->_i_tx_gpio, clkhz));
 
     /* Run DCO. */
-    PioDCOStart(&DCO);
+    //PioDCOStart(p);
 
     /* Set initial freq. */
-    assert_(0 == PioDCOSetFreq(&DCO, freq_hz, 0u));
+    assert_(0 == PioDCOSetFreq(p, freq_hz, 0U));
 
     /* Run the main DCO algorithm. It spins forever. */
-    PioDCOWorker(&DCO);
+    PioDCOWorker(p);
 }

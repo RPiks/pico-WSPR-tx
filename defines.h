@@ -70,6 +70,7 @@
 #define YES 1                                        /* The answer is yes. */
 #define OFF 0                                       /* Turn something off. */
 #define ON 1                                         /* Turn something on. */
+#define ZERO 0                                 /* Something in zero state. */
 
 #define RAM __not_in_flash_func         /* Place time-critical func in RAM */
 #define RAM_A __not_in_flash("A")        /* Place time-critical var in RAM */
@@ -91,5 +92,10 @@
 #define WSPR_SHIFT_FREQ_HZ      50UL
 //#define WSPR_FREQ_STEP_MILHZ    1465UL
 #define WSPR_FREQ_STEP_MILHZ    2930UL
+
+#define MINUTE 60
+#define HOUR (60 * MINUTE)
+
+#define GPS_PPS_PIN 2
 
 #endif

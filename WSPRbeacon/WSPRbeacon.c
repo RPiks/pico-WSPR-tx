@@ -58,9 +58,13 @@
 /// @param pgridsquare Maidenhead locator, 7 chr max.
 /// @param txpow_dbm TX power, db`mW.
 /// @param pdco Ptr to working DCO.
-/// @return the context.
+/// @param dial_freq_hz The begin of working WSPR passband.
+/// @param shift_freq_hz The shift of tx freq. relative to dial_freq_hz.
+/// @param gpio Pico's GPIO pin of RF output.
+/// @return Ptr to the new context.
 WSPRbeaconContext *WSPRbeaconInit(const char *pcallsign, const char *pgridsquare, int txpow_dbm,
-                                  PioDco *pdco)
+                                  PioDco *pdco, uint32_t dial_freq_hz, uint32_t shift_freq_hz,
+                                  int gpio)
 {
     assert_(pdco);
 
@@ -70,9 +74,12 @@ WSPRbeaconContext *WSPRbeaconInit(const char *pcallsign, const char *pgridsquare
     strncpy(p->_pu8_callsign, pcallsign, sizeof(p->_pu8_callsign));
     strncpy(p->_pu8_locator, pgridsquare, sizeof(p->_pu8_locator));
     p->_u8_txpower = txpow_dbm;
+    
 
     p->_pTX = TxChannelInit(682667, 0, pdco);
     assert_(p->_pTX);
+    p->_pTX->_u32_dialfreqhz = dial_freq_hz + shift_freq_hz;
+    p->_pTX->_i_tx_gpio = gpio;
 
     return p;
 }
@@ -109,6 +116,65 @@ int WSPRbeaconSendPacket(const WSPRbeaconContext *pctx)
 
     memcpy(pctx->_pTX->_pbyte_buffer, pctx->_pu8_outbuf, WSPR_SYMBOL_COUNT);
     pctx->_pTX->_ix_input += WSPR_SYMBOL_COUNT;
+
+    return 0;
+}
+
+int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
+{
+    assert_(pctx);
+
+    const uint64_t u64tmnow = GetUptime64();
+    const uint32_t is_GPS_available = pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u32_nmea_gprmc_count;
+    const uint32_t is_GPS_active = pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u8_is_solution_active;
+    const uint32_t is_GPS_override = pctx->_txSched._u8_tx_GPS_past_time == YES;
+
+    const uint64_t u64_GPS_last_age_sec 
+        = (u64tmnow - pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u64_sysclk_nmea_last) / 1000000ULL;
+
+#if 1
+    StampPrintf("%llu %lu %lu %lu %llu", u64tmnow, is_GPS_available, is_GPS_active, is_GPS_override, u64_GPS_last_age_sec);
+    //return 0;
+#endif
+
+    if(!is_GPS_available)
+    {
+        StampPrintf("Waiting for GPS receiver...");
+        return -1;
+    }
+
+    if(is_GPS_active || (is_GPS_override && u64_GPS_last_age_sec < 2 * HOUR))
+    {
+        const uint32_t u32_unixtime_now 
+            = pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u32_utime_nmea_last + u64_GPS_last_age_sec;
+        
+        const int isec_of_hour = u32_unixtime_now % HOUR;
+        const int islot_number = isec_of_hour / (2 * MINUTE);
+        const int islot_modulo = islot_number % pctx->_txSched._u8_tx_slot_skip;
+
+        static int itx_trigger = 0;
+        if(ZERO == islot_modulo)
+        {
+            if(!itx_trigger)
+            {
+                itx_trigger = 1;
+                StampPrintf("Start transmission.");
+
+                //WSPRbeaconSetDialFreq(pWB, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ);
+                WSPRbeaconCreatePacket(pctx);
+                
+                PioDCOStart(pctx->_pTX->_p_oscillator);
+                sleep_ms(100);
+                WSPRbeaconSendPacket(pctx);
+            }
+        }
+        else
+        {
+            itx_trigger = 0;
+            StampPrintf("NO transmission slot.");
+            PioDCOStop(pctx->_pTX->_p_oscillator);
+        }
+    }
 
     return 0;
 }

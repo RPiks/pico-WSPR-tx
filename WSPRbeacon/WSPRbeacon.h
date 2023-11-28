@@ -55,6 +55,17 @@
 #include <stdint.h>
 #include <string.h>
 #include <TxChannel.h>
+#include <logutils.h>
+
+typedef struct
+{
+    uint8_t _u8_tx_slot_skip;           /* 0=1tx0skip, 1=1tx1skip, 2=1tx2skip, ... */
+    uint8_t _u8_tx_GPS_mandatory;       /* No tx when no active GPS solution. */
+    uint8_t _u8_tx_GPS_past_time;       /* Override _u8_tx_GPS_mandatory if there 
+                                           was solution in the past. */
+    uint8_t _u8_tx_heating_pause_min;   /* No tx during this interval from start. */
+
+} WSPRbeaconSchedule;
 
 typedef struct
 {
@@ -66,12 +77,17 @@ typedef struct
 
     TxChannelContext *_pTX;
 
+    WSPRbeaconSchedule _txSched;
+
 } WSPRbeaconContext;
 
 WSPRbeaconContext *WSPRbeaconInit(const char *pcallsign, const char *pgridsquare, int txpow_dbm,
-                                  PioDco *pdco);
+                                  PioDco *pdco, uint32_t dial_freq_hz, uint32_t shift_freq_hz,
+                                  int gpio);
 void WSPRbeaconSetDialFreq(WSPRbeaconContext *pctx, uint32_t freq_hz);
 int WSPRbeaconCreatePacket(WSPRbeaconContext *pctx);
 int WSPRbeaconSendPacket(const WSPRbeaconContext *pctx);
+
+int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose);
 
 #endif

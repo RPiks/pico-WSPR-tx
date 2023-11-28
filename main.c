@@ -53,32 +53,66 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "defines.h"
-
 #include "pico/multicore.h"
 #include "pico-hf-oscillator/lib/assert.h"
 #include "pico-hf-oscillator/defines.h"
+#include "defines.h"
 #include <piodco.h>
-
 #include <WSPRbeacon.h>
-
 #include "debug/logutils.h"
-
-PioDco DCO;
 
 void InitPicoHW(void);
 void Core1Entry(void);
 
+WSPRbeaconContext *pWSPR;
+
 int main()
 {
-    DEBUGPRINTF("\n");
-    sleep_ms(1000);
-    DEBUGPRINTF("Pico-WSPR-tx start.");
+    StampPrintf("\n");
+    sleep_ms(5000);
+    StampPrintf("R2BDY Pico-WSPR-tx start.");
 
     InitPicoHW();
 
-    DEBUGPRINTF("WSPR beacon init...");
-    WSPRbeaconContext *pWB = WSPRbeaconInit("R2BDY", "KO85", 6, &DCO);
+    StampPrintf("WSPR beacon init...");
+    
+    PioDco DCO;
+    GPStimeContext *pGPS = GPStimeInit(0, 9600, GPS_PPS_PIN);
+    assert_(pGPS);
+    DCO._pGPStime = pGPS;
+
+    WSPRbeaconContext *pWB = WSPRbeaconInit(
+        "R2BDY",        /* the Callsign. */
+        "KO85",         /* the QTH locator. */
+        10,             /* Tx power, dbm. */
+        &DCO,           /* the PioDCO object. */
+        7040000UL,      /* the dial frequency. */
+        55UL,           /* the carrier freq. shift relative to dial freq. */
+        6               /* RF output GPIO pin. */
+        );
+    assert_(pWB);
+    pWSPR = pWB;
+
+    pWB->_txSched._u8_tx_GPS_mandatory = YES;   /* Send WSPR signals only when GPS solution is active. */
+    pWB->_txSched._u8_tx_GPS_past_time = NO;    /* No relying on GPS sp;ution in the past. */
+    pWB->_txSched._u8_tx_slot_skip = 1;         /* 1 slot tx, 1 slot idle, etc. */
+    pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
+
+    StampPrintf("PioDco ADDR: %p", pWSPR->_pTX->_p_oscillator);
+
+    StampPrintf("RF oscillator start...");
+    sleep_ms(500);
+    multicore_launch_core1(Core1Entry);
+
+    for(;;)
+    {
+        WSPRbeaconTxScheduler(pWB, YES);
+
+        StampPrintf(".");
+
+        sleep_ms(1000);
+    }
+/*
     WSPRbeaconSetDialFreq(pWB, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ);
     DEBUGPRINTF("OK");
     
@@ -99,4 +133,5 @@ int main()
         DEBUGPRINTF("tick.");
         sleep_ms(1000);
     }
+*/
 }

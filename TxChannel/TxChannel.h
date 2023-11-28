@@ -70,6 +70,7 @@ typedef struct
 
     PioDco *_p_oscillator;
     uint32_t _u32_dialfreqhz;
+    int _i_tx_gpio;
 
 } TxChannelContext;
 
