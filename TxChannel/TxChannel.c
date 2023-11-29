@@ -150,7 +150,7 @@ void TxChannelClear(TxChannelContext *pctx)
 {
     pctx->_ix_input = pctx->_ix_output = 0;
 }
-
+/*
 void TxChannelStart(TxChannelContext *pctx)
 {
     pctx->_b_allowtx = YES;
@@ -160,3 +160,4 @@ void TxChannelStop(TxChannelContext *pctx)
 {
     pctx->_b_allowtx = NO;
 }
+*/

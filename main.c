@@ -91,48 +91,24 @@ int main()
     pWSPR = pWB;
     
     pWB->_txSched._u8_tx_GPS_mandatory = YES;   /* Send WSPR signals only when GPS solution is active. */
-    pWB->_txSched._u8_tx_GPS_past_time = NO;    /* No relying on GPS sp;ution in the past. */
-    pWB->_txSched._u8_tx_slot_skip = 1;         /* 1 slot tx, 1 slot idle, etc. */
+    pWB->_txSched._u8_tx_GPS_past_time = YES;   /* ?relying on GPS solution in the past. */
+    pWB->_txSched._u8_tx_slot_skip = 2;         /* 1 slot tx, 1 slot idle, etc. */
     pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
 
-    //sleep_ms(500);
     multicore_launch_core1(Core1Entry);
     StampPrintf("RF oscillator started.");
 
     DCO._pGPStime = GPStimeInit(0, 9600, GPS_PPS_PIN);
     assert_(DCO._pGPStime);
-    //StampPrintf("PioDco ADDR: %p", pWSPR->_pTX->_p_oscillator);
-    //StampPrintf("GPSTime ADDR: %p %p", pWSPR->_pTX->_p_oscillator->_pGPStime, DCO._pGPStime);
 
+    int tick = 0;
     for(;;)
     {
         WSPRbeaconTxScheduler(pWB, YES);
 
-        //StampPrintf(".");
-        WSPRbeaconDumpContext(pWB);
+        if(0 == ++tick % 10)
+            WSPRbeaconDumpContext(pWB);
 
         sleep_ms(1000);
     }
-/*
-    WSPRbeaconSetDialFreq(pWB, WSPR_DIAL_FREQ_HZ + WSPR_SHIFT_FREQ_HZ);
-    DEBUGPRINTF("OK");
-    
-    DEBUGPRINTF("Create packet...");
-    WSPRbeaconCreatePacket(pWB);
-    DEBUGPRINTF("OK");
-    
-    sleep_ms(100);
-    DEBUGPRINTF("Start oscillator on Core #1...");
-    multicore_launch_core1(Core1Entry);
-    DEBUGPRINTF("OK");
-
-    DEBUGPRINTF("Sending WSPR packet...");
-    WSPRbeaconSendPacket(pWB);
-
-    for(;;)
-    {
-        DEBUGPRINTF("tick.");
-        sleep_ms(1000);
-    }
-*/
 }
