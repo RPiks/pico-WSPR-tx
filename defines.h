@@ -52,7 +52,7 @@
 #ifndef DEFINESWSPR_H
 #define DEFINESWSPR_H
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 #define DEBUGPRINTF(x) StampPrintf(x);
@@ -94,5 +94,6 @@
         (6 * HOUR)                      /* How long is active without GPS. */
 
 #define GPS_PPS_PIN 2                                /* GPS time mark PIN. */
+#define RFOUT_PIN 6                                      /* RF output PIN. */
 
 #endif

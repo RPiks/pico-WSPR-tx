@@ -83,11 +83,11 @@ int main()
     WSPRbeaconContext *pWB = WSPRbeaconInit(
         "R2BDY",        /* the Callsign. */
         "KO85",         /* the QTH locator. */
-        10,             /* Tx power, dbm. */
+        16,             /* Tx power, dbm. */
         &DCO,           /* the PioDCO object. */
         7040000UL,      /* the dial frequency. */
         55UL,           /* the carrier freq. shift relative to dial freq. */
-        6               /* RF output GPIO pin. */
+        RFOUT_PIN       /* RF output GPIO pin. */
         );
     assert_(pWB);
     pWSPR = pWB;
@@ -112,9 +112,10 @@ int main()
         sleep_ms(100);
         gpio_put(PICO_DEFAULT_LED_PIN, 0);
 
+#ifdef DEBUG
         if(0 == ++tick % 60)
             WSPRbeaconDumpContext(pWB);
-
+#endif
         sleep_ms(900);
     }
 }
