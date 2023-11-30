@@ -81,21 +81,18 @@
   /* A macro of multiplication guarantees of doing so using 1 ASM command. */
 #define iMUL32ASM(a,b) __mul_instruction((int32_t)(a), (int32_t)(b))
 
-                                          /* Performing the square by ASM. */
-#define iSquare32ASM(x) (iMUL32ASM((x), (x))) 
-                                                         /* Hardware defs. */
-#define kHz 1000UL
-#define MHz 1000000UL
-#define PLL_SYS_MHZ 270UL
-                                                             /* WSPR defs. */
-//#define WSPR_DIAL_FREQ_HZ       7040000UL
-//#define WSPR_SHIFT_FREQ_HZ      50UL
-#define WSPR_FREQ_STEP_MILHZ    2930UL
-
-#define SECOND 1
+#define SECOND 1                                                  /* Time. */
 #define MINUTE (60 * SECOND)
 #define HOUR (60 * MINUTE)
 
-#define GPS_PPS_PIN 2
+#define kHz 1000UL                                                /* Freq. */
+#define MHz 1000000UL
+#define PLL_SYS_MHZ 270UL
+                                                             /* WSPR defs. */
+#define WSPR_FREQ_STEP_MILHZ    2930UL     /* FSK freq.bin (*2 this time). */
+#define WSPR_MAX_GPS_DISCONNECT_TM  \
+        (6 * HOUR)                      /* How long is active without GPS. */
+
+#define GPS_PPS_PIN 2                                /* GPS time mark PIN. */
 
 #endif

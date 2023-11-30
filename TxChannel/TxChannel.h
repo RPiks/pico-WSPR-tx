@@ -63,7 +63,6 @@ typedef struct
     uint32_t _bit_period_us;
 
     uint8_t _timer_alarm_num;
-    //uint8_t _b_allowtx;
 
     uint8_t _ix_input, _ix_output;
     uint8_t _pbyte_buffer[256];
@@ -81,7 +80,5 @@ uint8_t TxChannelPending(TxChannelContext *pctx);
 int TxChannelPush(TxChannelContext *pctx, uint8_t *psrc, int n);
 int TxChannelPop(TxChannelContext *pctx, uint8_t *pdst);
 void TxChannelClear(TxChannelContext *pctx);
-//void TxChannelStart(TxChannelContext *pctx);
-//void TxChannelStop(TxChannelContext *pctx);
 
 #endif

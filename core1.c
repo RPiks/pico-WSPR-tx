@@ -54,8 +54,7 @@
 
 #include "pico-hf-oscillator/lib/assert.h"
 #include <piodco.h>
-#include "defines.h"
-
+#include <defines.h>
 #include <WSPRbeacon.h>
 
 extern WSPRbeaconContext *pWSPR;
@@ -73,9 +72,6 @@ void Core1Entry()
 
     /* Initialize DCO */
     assert_(0 == PioDCOInit(p, pWSPR->_pTX->_i_tx_gpio, clkhz));
-
-    /* Run DCO. */
-    //PioDCOStart(p);
 
     /* Set initial freq. */
     assert_(0 == PioDCOSetFreq(p, freq_hz, 0U));

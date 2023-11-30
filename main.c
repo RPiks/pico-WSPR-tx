@@ -11,20 +11,24 @@
 //  DESCRIPTION
 //      The pico-WSPR-tx project provides WSPR beacon function using only
 //  Pi Pico board. *NO* additional hardware such as freq.synth required.
+//  External GPS receiver is optional and serves a purpose of holding
+//  WSPR time window order and accurate frequancy drift compensation.
 //
 //  HOWTOSTART
-//  .
+//      ./build.sh; cp ./build/*.uf2 /media/Pico_Board/
 //
 //  PLATFORM
 //      Raspberry Pi pico.
 //
 //  REVISION HISTORY
-// 
 //      Rev 0.1   18 Nov 2023
-//  Initial release.
+//      Rev 0.5   02 Dec 2023
 //
 //  PROJECT PAGE
 //      https://github.com/RPiks/pico-WSPR-tx
+//
+//  SUBMODULE PAGE
+//      https://github.com/RPiks/pico-hf-oscillator
 //
 //  LICENCE
 //      MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -56,13 +60,11 @@
 #include "pico/multicore.h"
 #include "pico-hf-oscillator/lib/assert.h"
 #include "pico-hf-oscillator/defines.h"
-#include "defines.h"
+#include <defines.h>
 #include <piodco.h>
 #include <WSPRbeacon.h>
-#include "debug/logutils.h"
-
-void InitPicoHW(void);
-void Core1Entry(void);
+#include <logutils.h>
+#include <protos.h>
 
 WSPRbeaconContext *pWSPR;
 
@@ -105,10 +107,14 @@ int main()
     for(;;)
     {
         WSPRbeaconTxScheduler(pWB, YES);
+        
+        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+        sleep_ms(100);
+        gpio_put(PICO_DEFAULT_LED_PIN, 0);
 
-        if(0 == ++tick % 10)
+        if(0 == ++tick % 60)
             WSPRbeaconDumpContext(pWB);
 
-        sleep_ms(1000);
+        sleep_ms(900);
     }
 }

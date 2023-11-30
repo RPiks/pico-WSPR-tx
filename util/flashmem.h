@@ -6,11 +6,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-//  init.c - Pico hardware initializations.
+//  flashmem.h - Utility of writing & reading a data from/to Pico's flash mem.
 // 
 //  DESCRIPTION
-//      The pico-WSPR-tx project provides WSPR beacon function using only
-//  Pi Pico board. *NO* additional hardware such as freq.synth required.
+//  .
 //
 //  HOWTOSTART
 //  .
@@ -20,7 +19,7 @@
 //
 //  REVISION HISTORY
 // 
-//      Rev 0.1   18 Nov 2023
+//      Rev 0.1   02 Dec 2023
 //  Initial release.
 //
 //  PROJECT PAGE
@@ -49,25 +48,17 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef FLASHMEM_H_
+#define FLASHMEM_H_
 
-#include "pico/stdlib.h"
-#include "hardware/clocks.h"
-#include <defines.h>
+#include "hardware/flash.h"
 
-/// @brief Initializes Pi pico low level hardware.
-void InitPicoHW(void)
+typedef struct
 {
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    void *_pFlashTargetOffset;
 
-    const uint32_t clkhz = PLL_SYS_MHZ * 1000000L;
-    set_sys_clock_khz(clkhz / kHz, true);
+} FlashMemContext;
 
-    clock_configure(clk_peri, 0,
-                    CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLKSRC_PLL_SYS,
-                    PLL_SYS_MHZ * MHZ,
-                    PLL_SYS_MHZ * MHZ);
-}
+
+
+#endif

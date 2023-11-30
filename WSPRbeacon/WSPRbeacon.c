@@ -50,7 +50,6 @@
 //  THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 #include "WSPRbeacon.h"
-
 #include <WSPRutility.h>
 
 /// @brief Initializes a new WSPR beacon context.
@@ -123,6 +122,11 @@ int WSPRbeaconSendPacket(const WSPRbeaconContext *pctx)
     return 0;
 }
 
+/// @brief Arranges WSPR sending in accordance with pre-defined schedule.
+/// @brief It works only if GPS receiver available (for now).
+/// @param pctx Ptr to Context.
+/// @param verbose Whether stdio output is needed.
+/// @return 0 if OK, -1 if NO GPS received available
 int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
 {
     assert_(pctx);
@@ -137,12 +141,12 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
 
     if(!is_GPS_available)
     {
-        StampPrintf("Waiting for GPS receiver...");
+        if(verbose) StampPrintf("WSPR> Waiting for GPS receiver...");
         return -1;
     }
 
     if(is_GPS_active || (pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u32_utime_nmea_last &&
-                         is_GPS_override && u64_GPS_last_age_sec < 2 * HOUR))
+                         is_GPS_override && u64_GPS_last_age_sec < WSPR_MAX_GPS_DISCONNECT_TM))
     {
         const uint32_t u32_unixtime_now 
             = pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u32_utime_nmea_last + u64_GPS_last_age_sec;
@@ -152,13 +156,12 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
         const int islot_modulo = islot_number % pctx->_txSched._u8_tx_slot_skip;
 
         static int itx_trigger = 0;
-        //StampPrintf("Slot: %d %d %d", islot_number, islot_modulo, itx_trigger);
         if(ZERO == islot_modulo)
         {
             if(!itx_trigger)
             {
                 itx_trigger = 1;
-                StampPrintf("WSPR> Start TX.");
+                if(verbose) StampPrintf("WSPR> Start TX.");
 
                 PioDCOStart(pctx->_pTX->_p_oscillator);
                 WSPRbeaconCreatePacket(pctx);
@@ -169,7 +172,7 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
         else
         {
             itx_trigger = 0;
-            StampPrintf("WSPR> Passive TX slot.");
+            if(verbose) StampPrintf("WSPR> Passive TX slot.");
             PioDCOStop(pctx->_pTX->_p_oscillator);
         }
     }
@@ -177,6 +180,8 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose)
     return 0;
 }
 
+/// @brief Dumps the beacon context to stdio.
+/// @param pctx Ptr to Context.
 void WSPRbeaconDumpContext(const WSPRbeaconContext *pctx)
 {
     assert_(pctx);

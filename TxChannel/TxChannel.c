@@ -58,8 +58,12 @@ static void __not_in_flash_func (TxChannelISR)(void)
     const int n2send = TxChannelPop(spTX, &byte);
     if(n2send)
     {
+        const int32_t i32_compensation_millis = 
+            PioDCOGetFreqShiftMilliHertz(spTX->_p_oscillator, 
+                                         (uint64_t)(spTX->_u32_dialfreqhz * 1000LL));
+
         PioDCOSetFreq(pDCO, spTX->_u32_dialfreqhz, 
-                      (uint32_t)byte * WSPR_FREQ_STEP_MILHZ);
+                      (uint32_t)byte * WSPR_FREQ_STEP_MILHZ - 2 * i32_compensation_millis);
     }
 
     spTX->_tm_future_call += spTX->_bit_period_us;
