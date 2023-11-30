@@ -1,11 +1,12 @@
 # pico-WSPR-tx
 WSPR beacon for Raspberry Pi Pico, based on pico-hf-oscillator PLL DCO library as submodule.
+The GPS reference is used to compensate Pico's clock drift. GPS is also used to schedule WSPR transmissions.
 
-![pico-wspr-rx](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/a69103e7-d766-4554-b288-aa0f82a74da9)
-The example of this WSPR beacon (QRPX power level) reception.
+![image](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/3f835a9d-fa42-4eb8-ba93-ea72033d9e62)
+The example of this WSPR beacon (QRPX power level) reception. Max QRB is ~3400 km.
 
-![Screenshot_2023-11-16_22-42-12](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/dcc20f80-17c8-4c37-84e6-c162bffd8bbb)
-The spectrum of this WSPR beacon received on SSB transceiver.
+![image](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/a86280b9-71cb-4bb2-8b3c-0e33d2499aca)
+High spectrum quality and less than 1Hz frequency drift.
 
 # *NO* additional hardware
 The WSPR beacon provides the output signal on the GPIO pin of Raspberry Pi Pico. No externall PLL, analog oscillators!
