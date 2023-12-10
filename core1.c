@@ -65,7 +65,6 @@ void Core1Entry()
     assert_(pWSPR);
 
     const uint32_t clkhz = PLL_SYS_MHZ * MHz;
-    const uint32_t freq_hz = pWSPR->_pTX->_u32_dialfreqhz;
 
     PioDco *p = pWSPR->_pTX->_p_oscillator;
     assert_(p);
@@ -74,8 +73,8 @@ void Core1Entry()
     assert_(0 == PioDCOInit(p, pWSPR->_pTX->_i_tx_gpio, clkhz));
 
     /* Set initial freq. */
-    assert_(0 == PioDCOSetFreq(p, freq_hz, 0U));
+    assert_(0 == PioDCOSetFreq(p, pWSPR->_pTX->_u32_dialfreqhz, 0U));
 
     /* Run the main DCO algorithm. It spins forever. */
-    PioDCOWorker(p);
+    PioDCOWorker2(p);
 }

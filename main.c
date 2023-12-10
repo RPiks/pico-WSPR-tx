@@ -66,6 +66,13 @@
 #include <logutils.h>
 #include <protos.h>
 
+#define CONFIG_GPS_SOLUTION_IS_MANDATORY NO
+#define CONFIG_GPS_RELY_ON_PAST_SOLUTION NO
+#define CONFIG_SCHEDULE_SKIP_SLOT_COUNT 5
+#define CONFIG_WSPR_DIAL_FREQUENCY 24926000UL // 28126000UL //7040000UL
+#define CONFIG_CALLSIGN "R2BDY"
+#define CONFIG_LOCATOR4 "KO85"
+
 WSPRbeaconContext *pWSPR;
 
 int main()
@@ -81,21 +88,20 @@ int main()
     StampPrintf("WSPR beacon init...");
 
     WSPRbeaconContext *pWB = WSPRbeaconInit(
-        "R2BDY",        /* the Callsign. */
-        "KO85",         /* the default QTH locator if GPS isn't used. */
-        16,             /* Tx power, dbm. */
+        CONFIG_CALLSIGN,/* the Callsign. */
+        CONFIG_LOCATOR4,/* the default QTH locator if GPS isn't used. */
+        12,             /* Tx power, dbm. */
         &DCO,           /* the PioDCO object. */
-        7040000UL,      /* the dial frequency. */
+        CONFIG_WSPR_DIAL_FREQUENCY,
         55UL,           /* the carrier freq. shift relative to dial freq. */
         RFOUT_PIN       /* RF output GPIO pin. */
         );
     assert_(pWB);
     pWSPR = pWB;
     
-    pWB->_txSched._u8_tx_GPS_mandatory = YES;   /* Send WSPR signals only when GPS solution is active. */
-    pWB->_txSched._u8_tx_GPS_past_time = YES;   /* ?relying on GPS solution in the past. */
-    pWB->_txSched._u8_tx_slot_skip = 5;         /* 1 slot tx, 1 slot idle, etc. */
-    //pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
+    pWB->_txSched._u8_tx_GPS_mandatory  = CONFIG_GPS_SOLUTION_IS_MANDATORY;
+    pWB->_txSched._u8_tx_GPS_past_time  = CONFIG_GPS_RELY_ON_PAST_SOLUTION;
+    pWB->_txSched._u8_tx_slot_skip      = CONFIG_SCHEDULE_SKIP_SLOT_COUNT;
 
     multicore_launch_core1(Core1Entry);
     StampPrintf("RF oscillator started.");
@@ -106,6 +112,7 @@ int main()
     int tick = 0;
     for(;;)
     {
+        /*
         if(WSPRbeaconIsGPSsolutionActive(pWB))
         {
             const char *pgps_qth = WSPRbeaconGetLastQTHLocator(pWB);
@@ -115,8 +122,32 @@ int main()
                 pWB->_pu8_locator[5] = 0x00;
             }
         }
-
-        WSPRbeaconTxScheduler(pWB, YES);
+        */
+       
+        if(pWB->_txSched._u8_tx_GPS_mandatory)
+        {
+            WSPRbeaconTxScheduler(pWB, YES);
+        }
+        else
+        {
+            StampPrintf("Omitting GPS solution, start tx now.");
+            PioDCOStart(pWB->_pTX->_p_oscillator);
+            WSPRbeaconCreatePacket(pWB);
+            sleep_ms(100);
+            WSPRbeaconSendPacket(pWB);
+            StampPrintf("The system will be halted when tx is completed.");
+            for(;;)
+            {
+                if(!TxChannelPending(pWB->_pTX))
+                {
+                    PioDCOStop(pWB->_pTX->_p_oscillator);
+                    StampPrintf("System halted.");
+                }
+                gpio_put(PICO_DEFAULT_LED_PIN, 1);
+                sleep_ms(500);
+                gpio_put(PICO_DEFAULT_LED_PIN, 0);
+            }
+        }
         
         gpio_put(PICO_DEFAULT_LED_PIN, 1);
         sleep_ms(100);

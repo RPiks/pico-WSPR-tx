@@ -113,7 +113,7 @@ int WSPRbeaconSendPacket(const WSPRbeaconContext *pctx)
 {
     assert_(pctx);
     assert_(pctx->_pTX);
-    assert_(pctx->_pTX->_u32_dialfreqhz > 1100 * kHz);
+    assert_(pctx->_pTX->_u32_dialfreqhz > 500 * kHz);
 
     TxChannelClear(pctx->_pTX);
 
