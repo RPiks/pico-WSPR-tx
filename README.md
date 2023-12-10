@@ -3,7 +3,7 @@ WSPR beacon for Raspberry Pi Pico, based on pico-hf-oscillator PLL DCO library a
 The GPS reference is used to compensate Pico's clock drift. GPS is also used to schedule WSPR transmissions.
 
 ![image](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/3f835a9d-fa42-4eb8-ba93-ea72033d9e62)
-The example of this WSPR beacon (QRPX power level) reception. Max QRB is ~3400 km.
+The example of this WSPR beacon (QRPX power level) reception. Last max QRB is ~3400 km on 40m band.
 
 ![image](https://github.com/RPiks/pico-WSPR-tx/assets/47501785/a86280b9-71cb-4bb2-8b3c-0e33d2499aca)
 High spectrum quality and less than 1Hz frequency drift.
@@ -28,7 +28,7 @@ My QRZ page is https://www.qrz.com/db/R2BDY
 
 6. Load the .uf2 file (2) into the Pico.
 
-7. Initialy the operating HF band is 40 meter (WSPR dial frequency is 7040 kHz).
+7. Initialy the operating HF band is 17 meter (WSPR dial frequency is 18106 kHz).
 
 8. Provide the feedback by clicking like on the github page of the project :).
 
