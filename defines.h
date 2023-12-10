@@ -78,6 +78,9 @@
      /* A macro for arithmetic right shifts, with casting of the argument. */
 #define iSAR(arg, rcount) (((int32_t)(arg)) >> (rcount))
 
+#define min(a,b) ((a)<(b)?(a):(b))
+#define max(a,b) ((a)>(b)?(a):(b))
+
   /* A macro of multiplication guarantees of doing so using 1 ASM command. */
 #define iMUL32ASM(a,b) __mul_instruction((int32_t)(a), (int32_t)(b))
 

@@ -82,7 +82,7 @@ int main()
 
     WSPRbeaconContext *pWB = WSPRbeaconInit(
         "R2BDY",        /* the Callsign. */
-        "KO85",         /* the QTH locator. */
+        "KO85",         /* the default QTH locator if GPS isn't used. */
         16,             /* Tx power, dbm. */
         &DCO,           /* the PioDCO object. */
         7040000UL,      /* the dial frequency. */
@@ -94,8 +94,8 @@ int main()
     
     pWB->_txSched._u8_tx_GPS_mandatory = YES;   /* Send WSPR signals only when GPS solution is active. */
     pWB->_txSched._u8_tx_GPS_past_time = YES;   /* ?relying on GPS solution in the past. */
-    pWB->_txSched._u8_tx_slot_skip = 2;         /* 1 slot tx, 1 slot idle, etc. */
-    pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
+    pWB->_txSched._u8_tx_slot_skip = 5;         /* 1 slot tx, 1 slot idle, etc. */
+    //pWB->_txSched._u8_tx_heating_pause_min = 1; /* Give 1 minute pre-heating ere first transmition. */
 
     multicore_launch_core1(Core1Entry);
     StampPrintf("RF oscillator started.");
@@ -106,6 +106,16 @@ int main()
     int tick = 0;
     for(;;)
     {
+        if(WSPRbeaconIsGPSsolutionActive(pWB))
+        {
+            const char *pgps_qth = WSPRbeaconGetLastQTHLocator(pWB);
+            if(pgps_qth)
+            {
+                strncpy(pWB->_pu8_locator, pgps_qth, 4);
+                pWB->_pu8_locator[5] = 0x00;
+            }
+        }
+
         WSPRbeaconTxScheduler(pWB, YES);
         
         gpio_put(PICO_DEFAULT_LED_PIN, 1);

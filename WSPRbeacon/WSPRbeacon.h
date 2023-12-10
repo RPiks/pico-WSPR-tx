@@ -92,4 +92,7 @@ int WSPRbeaconTxScheduler(WSPRbeaconContext *pctx, int verbose);
 
 void WSPRbeaconDumpContext(const WSPRbeaconContext *pctx);
 
+char *WSPRbeaconGetLastQTHLocator(const WSPRbeaconContext *pctx);
+uint8_t WSPRbeaconIsGPSsolutionActive(const WSPRbeaconContext *pctx);
+
 #endif

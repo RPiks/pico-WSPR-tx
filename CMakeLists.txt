@@ -31,6 +31,7 @@ target_sources(pico-wspr-tx PUBLIC
                ${CMAKE_CURRENT_LIST_DIR}/TxChannel/TxChannel.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/WSPRutility.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/nhash.c
+               ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/thirdparty/maidenhead.c
                ${CMAKE_CURRENT_LIST_DIR}/WSPRbeacon/WSPRbeacon.c
                ${CMAKE_CURRENT_LIST_DIR}/debug/logutils.c
                ${CMAKE_CURRENT_LIST_DIR}/init.c
