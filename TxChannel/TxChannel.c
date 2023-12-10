@@ -113,7 +113,7 @@ TxChannelContext *TxChannelInit(const uint32_t bit_period_us, uint8_t timer_alar
 /// @return A count of bytes.
 uint8_t TxChannelPending(TxChannelContext *pctx)
 {
-    return 256 + pctx->_ix_input - pctx->_ix_output;
+    return 256L + (int)pctx->_ix_input - (int)pctx->_ix_output;
 }
 
 /// @brief Push a number of bytes to the output FIFO.
@@ -154,14 +154,3 @@ void TxChannelClear(TxChannelContext *pctx)
 {
     pctx->_ix_input = pctx->_ix_output = 0;
 }
-/*
-void TxChannelStart(TxChannelContext *pctx)
-{
-    pctx->_b_allowtx = YES;
-}
-
-void TxChannelStop(TxChannelContext *pctx)
-{
-    pctx->_b_allowtx = NO;
-}
-*/
