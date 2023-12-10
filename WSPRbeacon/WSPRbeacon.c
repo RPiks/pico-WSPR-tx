@@ -51,6 +51,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "WSPRbeacon.h"
 #include <WSPRutility.h>
+#include <maidenhead.h>
 
 /// @brief Initializes a new WSPR beacon context.
 /// @param pcallsign HAM radio callsign, 12 chr max.
@@ -213,4 +214,31 @@ void WSPRbeaconDumpContext(const WSPRbeaconContext *pctx)
     StampPrintf("rmc:%lu", pGPS->_time_data._u32_nmea_gprmc_count);
     StampPrintf("pps:%llu", pGPS->_time_data._u64_sysclk_pps_last);
     StampPrintf("ppb:%lld", pGPS->_time_data._i32_freq_shift_ppb);
+}
+
+/// @brief Extracts maidenhead type QTH locator (such as KO85) using GPS coords.
+/// @param pctx Ptr to WSPR beacon context.
+/// @return ptr to string of QTH locator (static duration object inside get_mh).
+/// @remark It uses third-party project https://github.com/sp6q/maidenhead .
+char *WSPRbeaconGetLastQTHLocator(const WSPRbeaconContext *pctx)
+{
+    assert_(pctx);
+    assert_(pctx->_pTX);
+    assert_(pctx->_pTX->_p_oscillator);
+    assert_(pctx->_pTX->_p_oscillator->_pGPStime);
+    
+    const double lat = 1e-5 * (double)pctx->_pTX->_p_oscillator->_pGPStime->_time_data._i64_lat_100k;
+    const double lon = 1e-5 * (double)pctx->_pTX->_p_oscillator->_pGPStime->_time_data._i64_lon_100k;
+
+    return get_mh(lat, lon, 8);
+}
+
+uint8_t WSPRbeaconIsGPSsolutionActive(const WSPRbeaconContext *pctx)
+{
+    assert_(pctx);
+    assert_(pctx->_pTX);
+    assert_(pctx->_pTX->_p_oscillator);
+    assert_(pctx->_pTX->_p_oscillator->_pGPStime);
+
+    return YES == pctx->_pTX->_p_oscillator->_pGPStime->_time_data._u8_is_solution_active;
 }
