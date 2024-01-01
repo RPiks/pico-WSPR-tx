@@ -76,7 +76,7 @@ void StampPrintf(const char* pformat, ...)
     const uint32_t tm_sec = (uint32_t)(tm_us / 1000000ULL);
     tm_us -= (uint64_t)tm_sec * 1000000ULL;
 
-    stdio_set_driver_enabled(&stdio_uart, false);
+    //stdio_set_driver_enabled(&stdio_uart, false);
     printf("%02lud%02lu:%02lu:%02lu.%06llu [%04lu] ", tm_day, tm_hour, tm_min, tm_sec, tm_us, sTick++);
 
     va_list argptr;
@@ -85,5 +85,5 @@ void StampPrintf(const char* pformat, ...)
     va_end(argptr);
 
     printf("\n");
-    stdio_set_driver_enabled(&stdio_uart, true);
+    //stdio_set_driver_enabled(&stdio_uart, true);
 }

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_BUILD_TYPE "Release") 
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD 17)
 
 # Initialise pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
@@ -42,7 +42,7 @@ target_sources(pico-wspr-tx PUBLIC
 pico_set_program_name(pico-wspr-tx "pico-wspr-tx")
 pico_set_program_version(pico-wspr-tx "0.5")
 
-pico_enable_stdio_uart(pico-wspr-tx 1)
+pico_enable_stdio_uart(pico-wspr-tx 0)
 pico_enable_stdio_usb(pico-wspr-tx 1)
 
 # Add the standard include files to the build
@@ -63,6 +63,7 @@ target_link_libraries(pico-wspr-tx
                       hardware_timer
                       hardware_clocks
                       hardware_pio
+                      hardware_uart
                      )
 
 pico_add_extra_outputs(pico-wspr-tx)
